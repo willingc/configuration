@@ -264,6 +264,20 @@
 # gather_assets and db migrations
 - include: service_variant_config.yml
 
+# i18n testing
+- name: generate dummy i18n strings for testing
+  shell: >
+    rake i18n:extract && rake i18n:dummy && rake i18n:generate
+    executable=/bin/bash
+    chdir={{ edxapp_code_dir }}
+  sudo_user: "{{ edxapp_user }}"
+  when: celery_worker is not defined and not devstack
+  notify:
+  - "restart edxapp"
+  - "restart edxapp_workers"
+  environment: "{{ edxapp_environment }}"
+
+
   # call supervisorctl update. this reloads
   # the supervisorctl config and restarts
   # the services if any of the configurations
